@@ -1,44 +1,174 @@
-﻿SUJET 2 : ANALYSE D'ADRESSE IP
+Analyse d'adresse IPv4
 
-URL DEPOT GIT : https://gitlab.info.iut-tlse3.fr/mrm4917a/sujet2_mourabit_mirepoix/-/blob/main/README.md?ref_type=heads
+Description du projet
 
-RÉALISÉ PAR :  Amine MOURABIT & Walid MIREPOIX (Groupe D)
+Ce projet a pour objectif de développer une application en langage C capable d'analyser une adresse IPv4 et son masque réseau selon la notation CIDR. L'application calcule et fournit les informations suivantes :
 
+La classe de l'adresse IP.
 
-OBJECTIF : Ce projet a pour objectif de développer une application permettant d'analyser une adresse IP et son masque réseau. L'application détermine la classe de l'adresse IP, son type (privée ou publique), ainsi que les adresses réseau et hôte correspondantes.
+Le type de l'adresse (privée ou publique).
 
+Les adresses réseau et hôte correspondantes.
 
+Ce projet inclut également des validations sur la syntaxe de l'adresse IP et du masque, ainsi qu'une fonctionnalité pour enregistrer les résultats dans un fichier.
 
+Fonctionnalités principales
 
-DOCUMENTATION DES FONCTIONS ET CAS D'ERREUR
+Vérification de la validité de l'adresse IP et du masque.
 
-1. verifier_format :
-    Cette première fonction permet de vérifier si le format de l'adresse IP avec le masque (CIDR) est valide. Elle prend en entréé la chaîne de caractère saisie par l'utilisateur et renvoi "1" si le format et valide et "0" si non.
-    Elle renvoi "0" si la notation CIDR n'est pas respectée et si chaque octet de l'adresse IP est bien compris entre 0 et 255
+Extraction et traitement des champs de l'adresse IP et du masque.
 
-2. extraire_champs :
-    Cette fonction permet d'extraire l'adresse IP et le masque à partir de la chaîne de caractère entrée par l'utilisateur. Elle prend en paramètre d'entrée la chaîne de caractère saisie, la chaîne de caractère de la partie IP et celle du masque et renvoie "1" si l'extraction est réussite.
-    La fonction renvoie "0" si le format du masque est invalide et si le masque est compris entre 0 et 32.
+Calcul de la classe et du type de l'adresse IP.
 
-3. decoder_ip :
-    Cette fonction détermine la classe et le type de l'adresse IP entrée. Elle prend en paramètre la chaîne de caractère IP, classe et type. Elle ne renvoie rien (void).
-    Il n'y a pas de cas erreur.
+Conversion de l'adresse IP en format numérique.
 
-4. convertir_en_numerique :
-    Cette fonction convertit l'adresse IP en valeurs numériques. Elle prend en entrée la chaîne de caractère IP et l'entier ip_numerique[4]
+Détermination des adresses réseau et hôte.
 
-5. calculer_reseau_hote :
-    Cette fonction calcule les adresses réseau et hôte à partir de l'adresse IP et du masque. Elle prend en entrée la chaîne IP, l'entier masque/réseau/hôte. Elle ne renvoie rien (void).
-    Il n'y a pas de cas erreur.
+Affichage des résultats de manière claire.
 
-6. afficher_ip :
-    Cette fonction permet d'afficher l'adresse ip en format pointé. Elle prend en entrée l'entier non signée ip. Elle ne renvoie rien (void).
-    Il n'y a pas de cas erreur.
+Enregistrement des données dans un fichier.
 
-7. enregistrer_donnees :
-    Enfin, cette fonction permet d'enregistrer les données de l'adresse IP (valide) que l'utilisateur rentre, c'est à dire ce que renvoi la fonction main est directement enregistrer dans ce fichier. De plus, le Makefile permet de supprimer ce fichier lorsqu'on utilise "make clean". Elle ne renvoie rien (void).
-    Une erreur ce déclanche si le fichier ne s'ouvre pas.
+Structure des fonctions
 
-8. main :
-    L'utilisateur compile le fichier "analyse_ip.c" avec le Makefile (commande "make") puis l'exécute avec "./analyse_ip". Ensuite, il est demandé à l'utilsateur de saisie sa chaîne de caractère conforme à la notation CIDR (cas d'erreur si cela n'est pas respeté).
-    En sortie de programme, s'affiche les différentes caractéristiques de l'adresse IP (adresse IP saisie, masque saisie, classe, type, adresse reseau/hôte) saisie par l'utilisateur. S'affiche également "ip invalide" si la fonction verifier_format échoue et affiche "masque invalide" si la fonction extraire_champs échoue.
+1. verifier_format
+
+Description : Vérifie si l'adresse IP et le masque suivent une notation CIDR valide.
+
+Paramètres :
+
+Entrée : Chaîne de caractères (adresse IP avec masque).
+
+Sortie : 1 si le format est valide, 0 sinon.
+
+Cas d'erreur :
+
+Format CIDR incorrect.
+
+Valeurs des octets de l'adresse IP hors de l'intervalle [0, 255].
+
+2. extraire_champs
+
+Description : Extrait l'adresse IP et le masque de la chaîne d'entrée.
+
+Paramètres :
+
+Entrée : Chaîne de caractères (adresse IP et masque).
+
+Sortie : Chaîne pour l'adresse IP, chaîne pour le masque, et 1 si réussi.
+
+Cas d'erreur :
+
+Masque invalide ou hors de l'intervalle [0, 32].
+
+3. decoder_ip
+
+Description : Détermine la classe (A, B, C, D, E) et le type (privé ou public) de l'adresse IP.
+
+Paramètres :
+
+Entrée : Chaîne de caractères pour l'adresse IP.
+
+Sortie : Chaîne pour la classe et le type.
+
+Cas d'erreur : Aucun.
+
+4. convertir_en_numerique
+
+Description : Convertit une adresse IP en format numérique.
+
+Paramètres :
+
+Entrée : Chaîne de caractères pour l'adresse IP.
+
+Sortie : Tableau d'entiers contenant les valeurs numériques des octets.
+
+Cas d'erreur : Aucun.
+
+5. calculer_reseau_hote
+
+Description : Calcule les adresses réseau et hôte en fonction de l'adresse IP et du masque.
+
+Paramètres :
+
+Entrée : Adresse IP et masque.
+
+Sortie : Adresses réseau et hôte.
+
+Cas d'erreur : Aucun.
+
+6. afficher_ip
+
+Description : Affiche une adresse IP au format décimal pointé.
+
+Paramètres :
+
+Entrée : Valeurs numériques de l'adresse IP.
+
+Cas d'erreur : Aucun.
+
+7. enregistrer_donnees
+
+Description : Enregistre les résultats de l'analyse dans un fichier texte.
+
+Paramètres : Aucun.
+
+Cas d'erreur : Une erreur se produit si le fichier ne peut pas être ouvert.
+
+8. main
+
+Description :
+
+Permet à l'utilisateur de saisir une adresse IP avec masque au format CIDR.
+
+Affiche les résultats de l'analyse (classe, type, adresse réseau, adresse hôte).
+
+Cas d'erreur :
+
+Affiche « IP invalide » si verifier_format échoue.
+
+Affiche « Masque invalide » si extraire_champs échoue.
+
+Instructions d'utilisation
+
+Compilation et exécution
+
+Compilez le projet avec le Makefile fourni :
+
+make
+
+Exécutez le programme :
+
+./analyse_ip
+
+Saisie utilisateur
+
+Saisissez une adresse IP avec son masque au format CIDR (par ex. 192.168.1.1/24).
+
+Exemple de sortie
+
+Adresse IP saisie : 192.168.1.1
+Masque saisie : 24
+Classe : C
+Type : Privée
+Adresse réseau : 192.168.1.0
+Adresse hôte : 192.168.1.1
+
+Fichiers du projet
+
+analyse_ip.c : Code source principal.
+
+Makefile : Fichier pour compiler et nettoyer le projet.
+
+resultats.txt : Fichier généré contenant les résultats de l'analyse.
+
+Améliorations possibles
+
+Ajouter une interface graphique pour rendre l'application plus conviviale.
+
+Supporter d'autres notations IP (par ex. notation décimale ou hexadécimale).
+
+Ajouter une fonction pour analyser des plages d'adresses IP.
+
+Auteur
+
+Ce projet a été réalisé par [Votre Nom] dans le cadre d'un projet personnel de développement en C
