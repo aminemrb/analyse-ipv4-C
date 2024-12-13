@@ -10,10 +10,7 @@
 *                                                                             *
 *******************************************************************************
 *                                                                             *
-*  Nom-prénom1 : MOURABIT Amine                                                          *
-*                                                                             *
-*  Nom-prénom2 : MIREPOIX Walid                                                           *
-*
+*  Nom-prénom : MOURABIT Amine                                                          *
 *                                                                             *
 *******************************************************************************
 *                                                                             *
@@ -59,7 +56,8 @@ int extraire_champs(const char *ip_avec_masque, char *ip, int *masque) {
 }
 
 // Fonction pour décoder l'adresse IP et déterminer sa classe et son type
-void decoder_ip(const char *ip, char *classe_ip, char *type_ip, int masque) {
+// Fonction pour décoder l'adresse IP et déterminer sa classe et son type
+void decoder_ip(const char *ip, char *classe_ip, char *type_ip) {
     int premier_octet, deuxieme_octet, troisieme_octet, quatrieme_octet;
     sscanf(ip, "%d.%d.%d.%d", &premier_octet, &deuxieme_octet, &troisieme_octet, &quatrieme_octet);
 
@@ -81,20 +79,13 @@ void decoder_ip(const char *ip, char *classe_ip, char *type_ip, int masque) {
         strcpy(type_ip, "Privee");
     } else if (premier_octet == 127 && deuxieme_octet == 0 && troisieme_octet == 0 && quatrieme_octet == 1) {
         strcpy(type_ip, "Localhost");
-    } else if (premier_octet == 255 && deuxieme_octet == 255 && troisieme_octet == 255 && quatrieme_octet == 255 && masque == 32) {
-        strcpy(type_ip, "Broadcast");
-    } else if (quatrieme_octet == 255 && masque >=24) {
-        strcpy(type_ip, "Broadcast");
-    } else if (troisieme_octet == 255 && quatrieme_octet == 255 && masque >=16) {
-        strcpy(type_ip, "Broadcast");
-    } else if (deuxieme_octet == 255 && troisieme_octet == 255 && quatrieme_octet == 255 && masque >=8) {
-        strcpy(type_ip, "Broadcast");
     } else if (premier_octet >= 224 && premier_octet <= 239) {
         strcpy(type_ip, "Multicast");
     } else {
         strcpy(type_ip, "Publique");
     }
 }
+
 
 // Fonction pour convertir l'adresse IP en valeurs numériques
 void convertir_en_numerique(const char *ip, int ip_numerique[4]) {
@@ -104,19 +95,35 @@ void convertir_en_numerique(const char *ip, int ip_numerique[4]) {
 // Fonction pour calculer les adresses réseau et hôte
 void calculer_reseau_hote(const char *ip, int masque, int *reseau, int *hote) {
     int ip_numerique[4];
-    convertir_en_numerique(ip, ip_numerique);
+    convertir_en_numerique(ip, ip_numerique );
 
+    // Convertir l'IP en une valeur binaire unique
     unsigned long ip_binaire = (ip_numerique[0] << 24) | (ip_numerique[1] << 16) | (ip_numerique[2] << 8) | ip_numerique[3];
+    
+    // Créer le masque binaire correspondant à la longueur du masque CIDR
     unsigned long masque_binaire = (0xFFFFFFFF << (32 - masque)) & 0xFFFFFFFF;
 
+    // Calculer l'adresse réseau : appliquer un ET binaire entre l'IP et le masque
     *reseau = ip_binaire & masque_binaire;
+
+    // Calculer l'adresse hôte : appliquer un NON binaire entre l'IP et le masque
     *hote = ip_binaire & ~masque_binaire;
 }
+
 
 // Fonction pour afficher l'adresse IP en format pointé
 void afficher_ip(unsigned long ip) {
     printf("%lu.%lu.%lu.%lu\n",
            (ip >> 24) & 0xFF, (ip >> 16) & 0xFF, (ip >> 8) & 0xFF, ip & 0xFF);
+}
+
+// Fonction pour convertir le masque CIDR en notation décimale
+void convertir_masque(int masque_cidr, unsigned char masque_dec[4]) {
+    unsigned long masque_binaire = (0xFFFFFFFF << (32 - masque_cidr)) & 0xFFFFFFFF;
+    masque_dec[0] = (masque_binaire >> 24) & 0xFF;
+    masque_dec[1] = (masque_binaire >> 16) & 0xFF;
+    masque_dec[2] = (masque_binaire >> 8) & 0xFF;
+    masque_dec[3] = masque_binaire & 0xFF;
 }
 
 // Fonction pour enregistrer les données dans un fichier
@@ -127,7 +134,11 @@ void enregistrer_donnees(const char *filename, const char *ip, int masque, char 
         return;
     }
 
-    fprintf(file, "Adresse IP : %s, Masque : %d\n", ip, masque);
+    unsigned char masque_dec[4];
+    convertir_masque(masque, masque_dec);
+
+    fprintf(file, "Adresse IP : %s, Masque : %d (%u.%u.%u.%u)\n",
+            ip, masque, masque_dec[0], masque_dec[1], masque_dec[2], masque_dec[3]);
     fprintf(file, "Classe IP : %c, Type IP : %s\n", classe_ip, type_ip);
     fprintf(file, "Adresse reseau : %u.%u.%u.%u\n",
             (reseau >> 24) & 0xFF, (reseau >> 16) & 0xFF, (reseau >> 8) & 0xFF, reseau & 0xFF);
@@ -157,20 +168,22 @@ int main() {
         return 1;
     }
 
-    printf("Adresse IP : %s, Masque : %d\n", ip, masque);
-
-    decoder_ip(ip, &classe_ip, type_ip, masque);
-    printf("Classe IP : %c, Type IP : %s\n", classe_ip, type_ip);
-
+    decoder_ip(ip, &classe_ip, type_ip);
     calculer_reseau_hote(ip, masque, &reseau, &hote);
+
+    // Affichage des résultats
+    unsigned char masque_dec[4];
+    convertir_masque(masque, masque_dec); // Conversion en notation décimale
+    printf("Adresse IP : %s, Masque : %d (%u.%u.%u.%u)\n",
+            ip, masque, masque_dec[0], masque_dec[1], masque_dec[2], masque_dec[3]);
+    printf("Classe IP : %c, Type IP : %s\n", classe_ip, type_ip);
     printf("Adresse reseau : ");
     afficher_ip(reseau);
     printf("Adresse hote : ");
     afficher_ip(hote);
 
-    // Enregistrer les données dans un fichier
-    enregistrer_donnees("resultat_ip.txt", ip, masque, classe_ip, type_ip, reseau, hote);
+    // Enregistrement dans un fichier
+    enregistrer_donnees("resultats.txt", ip, masque, classe_ip, type_ip, reseau, hote);
 
     return 0;
 }
-
